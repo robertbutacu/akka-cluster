@@ -1,8 +1,9 @@
-import akka.actor.{Actor, ActorLogging, RootActorPath, ActorRef, Terminated}
-import akka.cluster.{Cluster}
-import akka.cluster.ClusterEvent.{MemberUp}
-import akka.util.Timeout
-import scala.util.{Try, Success, Failure}
+package ClusterExample
+
+import akka.actor.{Actor, ActorLogging, ActorRef, RootActorPath, Terminated}
+import akka.cluster.Cluster
+import akka.cluster.ClusterEvent.MemberUp
+import scala.util.{Failure, Success, Try}
 import Roles.Consumer
 /**
   * Created by Robert-PC on 9/12/2017.
@@ -39,8 +40,9 @@ trait ProducerActor extends Actor with ActorLogging {
       val consumerRootPath = RootActorPath(member.address)
       val consumerSelection = context.actorSelection(consumerRootPath / "user" / Consumer)
 
-      import scala.concurrent.duration.DurationInt
       import context.dispatcher
+
+      import scala.concurrent.duration.DurationInt
       consumerSelection.resolveOne(5.seconds).onComplete(registerConsumer)
     case Terminated(actor) => strategy.removeRoutee(actor)
     case SimpleMessage =>
